@@ -2,6 +2,6 @@ interface name {
     new (gender);
     <age extends string>(age): boolean;
     aaa: string;
-    sayHello(name: string): boolean;
-    worker: (name: unknown, age: number) => boolean;
+    sayHello(name extends string): boolean;
+    worker: (name extends unknown, age extends number) => boolean;
 }
