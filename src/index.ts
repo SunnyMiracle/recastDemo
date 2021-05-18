@@ -10,33 +10,7 @@ const asts = parse(fileContent, {
   parser: require('recast/parsers/flow')
 }).program.body;
 
-
-// asts.forEach((expression) => {
-//   if (types.namedTypes.ClassDeclaration.check(expression)) {
-//     console.log(expression);
-//   }
-// })
-
-visit(asts, {
-  // visitClassDeclaration(path): any {
-  //   // console.log(path, 'class');
-  //   this.traverse(path);
-  // },
-  // visitClassProperty(...res): any {
-  //   console.log(res);
-  //   return false;
-  // }
-  // visitVariableDeclaration(path): any {
-  //   const declaration = path.node.declarations[0];
-  //   // @ts-ignore
-  //   const name = declaration.id.name;
-  //   if (name === 'name') {
-  //     this.traverse(path);
-  //   }
-  //   console.log(name);
-  //   return false;
-  // }
-});
+visit(asts, {});
 
 const builders = types.builders;
 
@@ -44,91 +18,29 @@ const printF = (nodes) => {
   console.log(print(nodes).code);
 }
 
-// const id = types.builders.identifier('name');
-// const body = types.builders.tsInterfaceBody([
-//   builders.tsConstructSignatureDeclaration.from({
-//     parameters: [builders.identifier('gender')],
-//   }),
-//   builders.tsCallSignatureDeclaration.from({
-//     parameters: [builders.identifier('age')],
-//     typeAnnotation: builders.tsTypeAnnotation(builders.tsBooleanKeyword()),
-//     typeParameters: builders.tsTypeParameterDeclaration.from({
-//       params: [builders.tsTypeParameter('age', builders.tsStringKeyword())]
-//     }),
-//   }),
-//   builders.tsPropertySignature.from({
-//     key: builders.identifier('aaa'),
-//     typeAnnotation: builders.tsTypeAnnotation.from({
-//       typeAnnotation: builders.tsStringKeyword(),
-//     }),
-//   }),
-//   types.builders.tsMethodSignature(
-//     types.builders.identifier('sayHello'),
-//     [
-//       types.builders.tsTypeParameter('name', builders.tsStringKeyword()),
-//     ],
-//     types.builders.tsTypeAnnotation(
-//       types.builders.tsBooleanKeyword()
-//     )
-//   ),
-//   builders.tsPropertySignature(
-//     builders.identifier('worker'),
-//     builders.tsTypeAnnotation(
-//       builders.tsFunctionType.from({
-//         parameters: [
-//           builders.tsTypeParameter('name', builders.tsUnknownKeyword()),
-//           builders.tsTypeParameter('age', builders.tsNumberKeyword()),
-//         ],
-//         typeAnnotation: builders.tsTypeAnnotation(builders.tsBooleanKeyword()),
-//       })
-//     )
-//   ),
-// ]);
-// const result = types.builders.tsInterfaceDeclaration(id, body);
-// console.log(print(result).code);
-//
-// const age = types.builders.tsExpressionWithTypeArguments(
-//   types.builders.identifier('age'),
-//   types.builders.tsTypeParameterInstantiation(
-//     [types.builders.tsStringKeyword()]
-//   )
-// );
-//
-// const other = types.builders.tsIndexSignature(
-//  [types.builders.identifier('other')],
-//   types.builders.tsTypeAnnotation(
-//     types.builders.tsStringKeyword(),
-//   )
-// );
-// const functionType = builders.tsFunctionType.from({
-//   comments: [builders.commentLine('cesh')],
-//   parameters: [builders.identifier('name')],
-//   typeAnnotation: builders.tsTypeAnnotation(builders.tsBooleanKeyword()),
-//   typeParameters: builders.tsTypeParameterDeclaration(
-//     [builders.tsTypeParameter('name', builders.tsStringKeyword())]
-//   )
-// });
-//
-// const a = builders.tsTypePredicate(
-//   builders.identifier('name'),
-//   builders.tsTypeAnnotation(builders.tsStringKeyword()),
-// )
-//
-// console.log(print(age).code, print(other).code);
-// console.log(print(functionType).code);
-// console.log(print(a).code);
-//
-// const property = builders.tsPropertySignature.from({
-//   key: builders.identifier('property'),
-//   typeAnnotation: builders.tsTypeAnnotation.from({
-//     typeAnnotation: builders.tsFunctionType.from({
-//       parameters: [],
-//       typeAnnotation: builders.tsTypeAnnotation(builders.tsBooleanKeyword()),
-//     }),
-//   }),
-// });
-//
-// console.log(print(property).code);
+const typeAnnoation = builders.tsTypeAnnotation.from({
+  typeAnnotation: builders.tsBooleanKeyword(),
+});
+printF(typeAnnoation);
+
+const typeParameter = builders.tsTypeParameterDeclaration.from({
+  params: [builders.tsTypeParameter.from({
+    name: 'aaa',
+    typeAnnotation: typeAnnoation
+  })]
+});
+printF(typeParameter);
+
+const typeInstance = builders.tsTypeParameterInstantiation.from({
+  params: [builders.tsStringKeyword(), builders.tsBooleanKeyword()]
+});
+printF(typeInstance);
+
+const typeExpressWithType = builders.tsExpressionWithTypeArguments.from({
+   expression: builders.identifier('name'),
+  typeParameters: typeInstance,
+});
+printF(typeExpressWithType);
 
 const qualifiedName = builders.tsQualifiedName.from({
   left: builders.identifier('name'),
@@ -239,11 +151,27 @@ printF(infer);
 
 const typeParams = builders.tsTypeParameter.from({
   name: 'typeParams',
-  typeAnnotation: builders.tsTypeAnnotation.from({
-    typeAnnotation: builders.tsStringKeyword(),
-  }),
+  optional: true,
+  default: builders.tsBooleanKeyword(),
+  typeAnnotation: typeAnnoation,
+  constraint: builders.tsBooleanKeyword(),
 });
 printF(typeParams);
+
+const id = builders.identifier.from({
+  name: 'id',
+  typeAnnotation: typeAnnoation,
+});
+printF(id);
+
+const fun = builders.tsDeclareFunction.from({
+  id: builders.identifier('name'),
+  params: [id],
+  returnType: typeAnnoation,
+});
+
+printF(fun);
+
 
 //
 // const codeString = "const say = (name: string) => { console.log(name); }"

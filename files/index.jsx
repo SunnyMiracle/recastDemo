@@ -8,6 +8,8 @@ import './index.less';
 class Loading extends React.Component {
   static propTypes = {
     show: PT.bool.isRequired,
+    name: PT.string,
+    age: React.propTypes.number.isRequired,
   };
 
   render() {
