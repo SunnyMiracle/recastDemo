@@ -26,6 +26,7 @@ const interfaceE = builders.tsInterfaceDeclaration.from({
     body: [
       builders.tsPropertySignature.from({
         key: builders.identifier('name'),
+        optional: true,
         typeAnnotation: builders.tsTypeAnnotation.from({
           typeAnnotation: builders.tsStringKeyword(),
         }),
@@ -35,6 +36,13 @@ const interfaceE = builders.tsInterfaceDeclaration.from({
 });
 
 out(interfaceE);
+
+const exportInterface = builders.exportNamedDeclaration.from({
+  declaration: interfaceE,
+});
+
+out(exportInterface);
+
 
 const interfaceType = builders.interfaceTypeAnnotation.from({
   body: builders.objectTypeAnnotation.from({
@@ -51,10 +59,54 @@ const classA = builders.classDeclaration.from({
     property: builders.identifier('Component'),
   }),
   superTypeParameters: builders.tsTypeParameterInstantiation.from({
-    params: []
+    params: [
+      builders.tsExpressionWithTypeArguments.from({
+        expression: builders.identifier('IProps'),
+      }),
+      builders.tsExpressionWithTypeArguments.from({
+        expression: builders.identifier('IState'),
+      }),
+    ]
   }),
   body: builders.classBody.from({
-    body: []
+    body: [
+      builders.tsMethodSignature.from({
+        key: builders.identifier('name'),
+        parameters: [builders.identifier('info')],
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsBooleanKeyword(),
+        })
+      }),
+      builders.methodDefinition.from({
+        key: builders.identifier('abc'),
+        static: true,
+        kind: 'method',
+        value: builders.functionDeclaration.from({
+          id: builders.identifier('id'),
+          body: builders.blockStatement.from({
+            body: [],
+          }),
+          params: [],
+          typeParameters: builders.tsTypeParameterDeclaration.from({
+            params: [],
+          }),
+        }),
+      }),
+      builders.methodDefinition.from({
+        key: builders.identifier('config'),
+        static: true,
+        kind: 'method',
+        value: builders.arrowFunctionExpression.from({
+          returnType: builders.tsTypeAnnotation.from({
+            typeAnnotation: builders.tsBooleanKeyword(),
+          }),
+          body: builders.blockStatement.from({
+            body: []
+          }),
+          params: [],
+        })
+      }),
+    ]
   }),
 });
 

@@ -11,6 +11,11 @@ class Loading extends React.Component {
     name: PT.string,
     age: React.propTypes.number.isRequired,
   };
+  static configNum = 100;
+  static cofnigName = 'config name';
+  static config(info) {
+
+  }
 
   render() {
     let name = () => {

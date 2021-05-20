@@ -20,6 +20,10 @@ const PropTypes: { [key: string]: object } = {};
 const isPropTypesProperty = (path: NodePath<namedTypes.ClassProperty>) => {
   return path.node.static && (path.node.key as Kinds.IdentifierKind).name === 'propTypes';
 }
+// 判断是否为静态属性
+const isStaticProperty = (path: NodePath<namedTypes.ClassProperty>): boolean => {
+  return path.node.static;
+}
 
 visit(asts, {
   // visitImportDeclaration(path): any {
@@ -36,6 +40,7 @@ visit(asts, {
     this.traverse(path);
   },
   visitClassProperty(path): any {
+    // 处理propTypes
     if (isPropTypesProperty(path)) {
       const node = path.node;
       if (types.namedTypes.ObjectExpression.assert(node.value)) {
@@ -65,6 +70,23 @@ visit(asts, {
           }
         });
       }
+    } else if (isStaticProperty(path)) {
+      // 处理其他静态属性
+      const node = path.node;
+      console.log((node.key as Kinds.IdentifierKind).name);
+    }
+    return false;
+  },
+  visitClassMethod(path): any {
+    const node = path.node;
+    if (node.static) {
+      const key = node.key as Kinds.IdentifierKind;
+      const params = node.params;
+      const args = [];
+      params.forEach(item => {
+        args.push((item as Kinds.IdentifierKind).name);
+      });
+      console.log(key.name, args);
     }
     return false;
   },
