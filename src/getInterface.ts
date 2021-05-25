@@ -3,7 +3,7 @@ import { types, print } from 'recast';
 const builders = types.builders;
 
 const out = (nodes: types.ASTNode) => {
-  console.log(print(nodes).code);
+  console.log('declare', print(nodes).code);
 }
 
 const className = 'Loading';
@@ -43,6 +43,11 @@ const exportInterface = builders.exportNamedDeclaration.from({
 
 out(exportInterface);
 
+const exportDefafult = builders.exportDefaultDeclaration.from({
+  declaration: builders.identifier('a')
+});
+out(exportDefafult);
+
 
 const interfaceType = builders.interfaceTypeAnnotation.from({
   body: builders.objectTypeAnnotation.from({
@@ -70,13 +75,6 @@ const classA = builders.classDeclaration.from({
   }),
   body: builders.classBody.from({
     body: [
-      builders.tsMethodSignature.from({
-        key: builders.identifier('name'),
-        parameters: [builders.identifier('info')],
-        typeAnnotation: builders.tsTypeAnnotation.from({
-          typeAnnotation: builders.tsBooleanKeyword(),
-        })
-      }),
       builders.methodDefinition.from({
         key: builders.identifier('abc'),
         static: true,
@@ -92,28 +90,110 @@ const classA = builders.classDeclaration.from({
           }),
         }),
       }),
-      builders.methodDefinition.from({
-        key: builders.identifier('config'),
+      builders.classMethod.from({
+        key: builders.identifier('classMethod'),
+        body: builders.blockStatement.from({
+          body: [],
+        }),
+        params: [],
         static: true,
-        kind: 'method',
-        value: builders.arrowFunctionExpression.from({
-          returnType: builders.tsTypeAnnotation.from({
-            typeAnnotation: builders.tsBooleanKeyword(),
-          }),
-          body: builders.blockStatement.from({
-            body: []
-          }),
-          params: [],
+      }),
+      builders.classPropertyDefinition.from({
+        definition: builders.classProperty.from({
+          access: 'public',
+          value: builders.identifier('abc'),
+          key: builders.identifier('classPropertyDefinition'),
+        })
+      }),
+      builders.classProperty.from({
+        key: builders.identifier('classProperty'),
+        static: true,
+        value: builders.identifier('value'),
+      }),
+      builders.classPrivateProperty.from({
+        key: builders.privateName(builders.identifier('classPrivateProperty')),
+        value: builders.identifier('value'),
+      }),
+      builders.tsDeclareMethod.from({
+        key: builders.identifier('tsDeclareMethod'),
+        params: [],
+        static: true,
+        returnType: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsBooleanKeyword(),
+        }),
+      }),
+      builders.tsCallSignatureDeclaration.from({
+        parameters: []
+      }),
+      builders.tsConstructSignatureDeclaration.from({
+        parameters: []
+      }),
+      builders.tsIndexSignature.from({
+        parameters: []
+      }),
+      builders.tsMethodSignature.from({
+        key: builders.identifier('tsMethodSignature'),
+        parameters: [builders.identifier('info')],
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsBooleanKeyword(),
+        })
+      }),
+      builders.tsPropertySignature.from({
+        key: builders.identifier('tsPropertySignature'),
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsFunctionType.from({
+            parameters: [],
+            typeAnnotation: builders.tsTypeAnnotation.from({
+              typeAnnotation: builders.tsBooleanKeyword(),
+            })
+          })
         })
       }),
     ]
   }),
 });
 
+const classImplementsEx = builders.classImplements.from({
+  id: builders.identifier('LoadingClassImplement'),
+  superClass: builders.identifier('React.Component'),
+  typeParameters: builders.typeParameterInstantiation.from({
+    params: []
+  })
+});
+
+const classBDeclare = builders.declareClass.from({
+  id: builders.identifier('Loading'),
+  body: builders.objectTypeAnnotation.from({
+    properties: [
+      builders.objectTypeProperty.from({
+        key: builders.identifier('name'),
+        value: builders.numberTypeAnnotation(),
+        optional: true,
+      })
+    ]
+  }),
+  typeParameters: builders.typeParameterDeclaration.from({
+    params: []
+  }),
+  extends: [
+    builders.interfaceExtends.from({
+      id: builders.identifier.from({
+        name: 'React',
+        typeAnnotation:  builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsBooleanKeyword(),
+        })
+      })
+    }),
+  ]
+});
+
+out(classImplementsEx);
+
 const exportEx = builders.exportDefaultDeclaration.from({
   declaration: classA,
 })
 
 out(classA);
-out(exportEx);
+// out(classBDeclare);
+// out(exportEx);
 
