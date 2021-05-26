@@ -172,6 +172,13 @@ const fun = builders.tsDeclareFunction.from({
 
 printF(fun);
 
+const expression = builders.tsQualifiedName.from({
+  left: builders.identifier('React'),
+  right: builders.identifier('ReactNode'),
+});
+
+printF(expression);
+
 
 //
 // const codeString = "const say = (name: string) => { console.log(name); }"
