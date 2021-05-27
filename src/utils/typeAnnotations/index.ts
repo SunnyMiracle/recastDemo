@@ -73,11 +73,11 @@ const elementType = builders.tsTypeAnnotation.from({
 
 // TODO  下边这些方法展示不支持。
 // instanceOf
-// oneOf
+// oneOf  枚举类
 // oneOfType
 // arrayOf
 // objectOf
-// shape
+// shape 对象的具体定义
 // exact
 export default {
   any,

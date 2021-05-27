@@ -5,7 +5,15 @@ import { namedTypes } from 'ast-types/gen/namedTypes';
 import * as fs from 'fs';
 import { IProperty } from "./getInterface";
 
-export default (filePath: string): { className: string; PropTypes: IProperty } => {
+export interface IPropertyInfo {
+  propertyKey: string;
+  type: IPropertyInfo | string;
+  childType?: IPropertyInfo[]; // instanceOf oneOf oneOfType arrayOf objectOf shape exact type为这几种的时候有值
+  isRequired: boolean;
+}
+
+
+export default (filePath: string): { className: string; PropTypes: IPropertyInfo[] } => {
   const fileContent = fs.readFileSync(filePath).toString();
 
   const asts = parse(fileContent, {
@@ -14,7 +22,7 @@ export default (filePath: string): { className: string; PropTypes: IProperty } =
   
   let className: string;
   // let PTName: string;
-  const PropTypes: IProperty = {};
+  let PropTypes: IPropertyInfo[] = [];
 
   // 判读是否为类的静态属性
   const isPropTypesProperty = (path: NodePath<namedTypes.ClassProperty>) => {
@@ -23,6 +31,59 @@ export default (filePath: string): { className: string; PropTypes: IProperty } =
   // 判断是否为静态属性
   const isStaticProperty = (path: NodePath<namedTypes.ClassProperty>): boolean => {
     return path.node.static;
+  }
+  
+  // 遍历得出props定义
+  const mapPropsInfo = (objectExpression: Kinds.ObjectExpressionKind): IPropertyInfo[] => {
+    if (types.namedTypes.ObjectExpression.assert(objectExpression)) {
+      const properties = objectExpression.properties;
+      return properties.map((property) => {
+        if (types.namedTypes.ObjectProperty.assert(property)) {
+          let propertyKey: string;
+          let type: string;
+          let isRequired: boolean;
+          let childType: IPropertyInfo[];
+          if (types.namedTypes.Identifier.assert(property.key)) {
+            propertyKey = property.key.name;
+          }
+          
+          // 函数类型需要区分是否包含isRequired属性，包含 ==> MemberExpressionKind 不包含 ==> CallExpression
+          if (types.namedTypes.CallExpression.check(property.value)) {
+            isRequired = false;
+            const callee = property.value.callee as types.namedTypes.MemberExpression;
+            type = (callee.property as types.namedTypes.Identifier).name;
+            const argus = property.value.arguments;
+            childType = mapPropsInfo(argus[0] as types.namedTypes.ObjectExpression);
+          }
+          if (types.namedTypes.MemberExpression.check(property.value)) {
+            const lastProperty = (property.value.property as Kinds.IdentifierKind);
+            if (lastProperty.name === 'isRequired') {
+              isRequired = true;
+              if (types.namedTypes.CallExpression.check(property.value.object)) {
+                const callee = property.value.object.callee as types.namedTypes.MemberExpression;
+                type = (callee.property as types.namedTypes.Identifier).name;
+                const argus = property.value.object.arguments;
+                childType = mapPropsInfo(argus[0] as types.namedTypes.ObjectExpression);
+              }
+              if (types.namedTypes.MemberExpression.check(property.value.object)) {
+                const preProperty = property.value.object.property;
+                type = (preProperty as Kinds.IdentifierKind).name;
+              }
+            } else {
+              type = lastProperty.name;
+              isRequired = false;
+            }
+          }
+          return {
+            propertyKey,
+            type,
+            childType,
+            isRequired,
+          };
+        }
+      });
+    }
+    return [];
   }
   
   visit(asts, {
@@ -37,32 +98,7 @@ export default (filePath: string): { className: string; PropTypes: IProperty } =
       // 处理propTypes
       if (isPropTypesProperty(path)) {
         const node = path.node;
-        if (types.namedTypes.ObjectExpression.assert(node.value)) {
-          const properties = node.value.properties;
-          properties.forEach((property) => {
-            if (types.namedTypes.ObjectProperty.assert(property)) {
-              let propertyKey: string;
-              if (types.namedTypes.Identifier.assert(property.key)) {
-                propertyKey = property.key.name;
-              }
-              if (types.namedTypes.MemberExpression.assert(property.value)) {
-                const lastProperty = (property.value.property as Kinds.IdentifierKind);
-                if (lastProperty.name === 'isRequired') {
-                  const preProperty = (property.value.object as Kinds.MemberExpressionKind).property;
-                  PropTypes[propertyKey] = {
-                    isRequired: true,
-                    type: (preProperty as Kinds.IdentifierKind).name,
-                  };
-                } else {
-                  PropTypes[propertyKey] = {
-                    type: lastProperty.name,
-                    isRequired: false,
-                  };
-                }
-              }
-            }
-          });
-        }
+        PropTypes = mapPropsInfo(node.value as types.namedTypes.ObjectExpression);
       }
       return false;
     },

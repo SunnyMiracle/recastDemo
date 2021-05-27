@@ -18,6 +18,14 @@ class Loading extends React.Component {
     other: PT.any,
     id: PT.symbol.isRequired,
     otherInfo: PT.elementType.isRequired,
+    objectOf: PT.objectOf({
+      key: PT.string,
+      name: PT.string.isRequired,
+    }).isRequired,
+    arrayOf: PT.arrayOf({
+      key: PT.string,
+      name: PT.string.isRequired,
+    }),
   };
   static configNum = 100;
   static cofnigName = 'config name';
