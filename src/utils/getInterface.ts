@@ -1,13 +1,11 @@
 import { types } from 'recast';
-import TA from './typeAnnotations/index';
+import getAnnotation from './typeAnnotations';
+import {IProps} from "./getKeyInfo";
 
 const builders = types.builders;
 
 export interface IProperty {
-  [key: string]: {
-    isRequired?: boolean;
-    type: 'string' | 'number' | 'bool' | 'func' | string;
-  }
+  [key: string]: IProps
 }
 
 export default (properties: IProperty, name: string) => {
@@ -19,7 +17,7 @@ export default (properties: IProperty, name: string) => {
         builders.tsPropertySignature.from({
           key: builders.identifier(key),
           optional: !properties[key].isRequired,
-          typeAnnotation: TA[properties[key].type],
+          typeAnnotation: getAnnotation(properties[key]),
         })
       )),
     }),

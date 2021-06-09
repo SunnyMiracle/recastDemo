@@ -21,16 +21,7 @@ export default (className: string, propsName: string, stateName: string) => {
       ]
     }),
     body: builders.classBody.from({
-      body: [
-        builders.tsDeclareMethod.from({
-          key: builders.identifier('tsDeclareMethod'),
-          params: [],
-          // static: true,
-          returnType: builders.tsTypeAnnotation.from({
-            typeAnnotation: builders.tsBooleanKeyword(),
-          }),
-        }),
-      ]
+      body: []
     }),
   });
 };

@@ -2,6 +2,7 @@ import { parse, types, print, run, visit, Options } from 'recast';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import getAnnotation from "./utils/typeAnnotations";
 
 const fileContent = fs.readFileSync(path.resolve(__dirname, '../files/index.jsx')).toString();
 // console.log(fileContent)
@@ -22,6 +23,19 @@ const typeAnnoation = builders.tsTypeAnnotation.from({
   typeAnnotation: builders.tsBooleanKeyword(),
 });
 printF(typeAnnoation);
+const typeAnnotationObject = builders.tsTypeAnnotation.from({
+  typeAnnotation: builders.tsTypeLiteral.from({
+    members: [
+      builders.tsPropertySignature.from({
+        key: builders.identifier('key'),
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsAnyKeyword(),
+        }),
+      })
+    ]
+  })
+})
+printF(typeAnnotationObject)
 
 const typeParameter = builders.tsTypeParameterDeclaration.from({
   params: [builders.tsTypeParameter.from({
@@ -178,6 +192,56 @@ const expression = builders.tsQualifiedName.from({
 });
 
 printF(expression);
+
+const tuple = builders.tsTupleType.from({
+  elementTypes: [
+    builders.tsLiteralType.from({
+      literal: builders.numericLiteral(1),
+    })
+  ]
+})
+printF(tuple);
+const objectInfo = builders.tsInterfaceBody.from({
+  body: [
+    builders.tsIndexSignature.from({
+      parameters: [builders.identifier.from({
+        name: 'key',
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsStringKeyword(),
+        })
+      })],
+      typeAnnotation: builders.tsTypeAnnotation.from({
+        typeAnnotation: builders.tsBooleanKeyword(),
+      })
+    }),
+  ]
+})
+
+printF(objectInfo);
+
+const shapeInfo = builders.tsInterfaceBody.from({
+  body: [
+    builders.tsPropertySignature.from({
+      key: builders.identifier('aaa'),
+      typeAnnotation: builders.tsTypeAnnotation.from({
+        typeAnnotation: builders.tsBooleanKeyword(),
+      }),
+    }),
+    builders.tsIndexSignature.from({
+      parameters: [builders.identifier.from({
+        name: 'key',
+        typeAnnotation: builders.tsTypeAnnotation.from({
+          typeAnnotation: builders.tsStringKeyword(),
+        })
+      })],
+      typeAnnotation: builders.tsTypeAnnotation.from({
+        typeAnnotation: builders.tsBooleanKeyword(),
+      })
+    }),
+  ]
+});
+
+printF(shapeInfo);
 
 
 //
