@@ -10,7 +10,7 @@ import reactImport from "../reactImport";
 
 const keyInfo = getKeyInfo(path.resolve(__dirname, '../../../files/index.jsx'));
 
-// console.log(JSON.stringify(keyInfo));
+console.log(JSON.stringify(keyInfo));
 
 const IPropsNode = getInterface(keyInfo.PropTypes, 'IProps');
 const classNode = getClass(keyInfo.className, 'IProps', 'any');

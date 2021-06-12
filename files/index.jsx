@@ -18,22 +18,22 @@ class Loading extends React.Component {
     other: PT.any,
     id: PT.symbol.isRequired,
     otherInfo: PT.elementType.isRequired,
-    instanceOf: PropTypes.instanceOf(Test).isRequired,
-    oneOf: PropTypes.oneOf([1, 3]),
-    oneOf1: PropTypes.oneOf(['1', '2', false]),
-    oneOfType: PropTypes.oneOfType([PropTypes.string.isRequired, PropTypes.number, PropTypes.arrayOf(PropTypes.string)]).isRequired,
-    arrayOf: PropTypes.arrayOf(PropTypes.string),
-    objectOf: PropTypes.objectOf(PropTypes.bool).isRequired,
-    objectOf1: PropTypes.objectOf(PropTypes.shape({
-      name: PropTypes.string
+    instanceOf: PT.instanceOf(Test).isRequired,
+    oneOf: PT.oneOf([1, 3]),
+    oneOf1: PT.oneOf(['1', '2', false]),
+    oneOfType: PT.oneOfType([PT.string.isRequired, PT.number, PT.arrayOf(PT.string)]).isRequired,
+    arrayOf: PT.arrayOf(PT.string),
+    objectOf: PT.objectOf(PT.bool).isRequired,
+    objectOf1: PT.objectOf(PT.shape({
+      name: PT.string
     }).isRequired),
-    shape: PropTypes.shape({
-      name: PropTypes.string,
-      age: PropTypes.number
+    shape: PT.shape({
+      name: PT.string,
+      age: PT.number
     }).isRequired,
-    extra: PropTypes.exact({
-      gender: PropTypes.oneOf([0, 1]),
-      name: PropTypes.string,
+    extra: PT.exact({
+      gender: PT.oneOf([0, 1]),
+      name: PT.string,
     }),
   };
   static configNum = 100;
